@@ -4,7 +4,7 @@ version: '3.8'
 services:
   bot:
     build: &build
-      context: aiogram_bot_template
+      context: ./
     restart: always
     environment: &project_env
       - BOT_TOKEN
