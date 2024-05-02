@@ -3,3 +3,4 @@
 /.idea/
 __pycache__/
 /bot/db_test_connection.py
+/alembic/versions/
