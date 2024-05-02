@@ -1,0 +1,36 @@
+version: '3.8'
+
+
+services:
+  bot:
+    build: &build
+      context: ./
+    restart: always
+    environment: &project_env
+      - BOT_TOKEN
+      - DB_HOST
+      - DB_USER
+      - DB_PASS
+      - DB_NAME
+      - DB_URL
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5437:5432"
+
+volumes:
+  db_data: { }
