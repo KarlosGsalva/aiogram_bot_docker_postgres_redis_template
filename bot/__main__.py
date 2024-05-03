@@ -8,6 +8,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from aiogram.client.default import DefaultBotProperties
 
+from sqlalchemy import inspect
+
 from bot.middlewares.middleware import DbSessionMiddleware
 from bot.settings import config, SESSION_MAKER, DB_ENGINE
 from bot.database.db import Base
@@ -58,9 +60,31 @@ async def run_polling() -> None:
 
 
 def create_database_tables():
-    Base.metadata.create_all(DB_ENGINE)
+    try:
+        Base.metadata.create_all(DB_ENGINE)
+        logger.debug("Tables created successfully.")
+    except Exception as e:
+        logger.error(f"Failed to create tables: {e}")
+
+
+def check_table_exists(table_name: str):
+    inspector = inspect(DB_ENGINE)
+    tables = inspector.get_table_names()
+    if table_name in tables:
+        logger.debug(f"Table {table_name} exists.")
+        return True
+    else:
+        logger.debug(f"Table {table_name} does not exist.")
+        return False
 
 
 if __name__ == "__main__":
-    create_database_tables()
+    try:
+        create_database_tables()
+        if check_table_exists("user"):
+            logger.debug("Table 'user' exists.")
+        else:
+            logger.debug("Table 'user' does not exist.")
+    except Exception as e:
+        logger.error(f"DB don't created via {e}")
     asyncio.run(run_polling())
