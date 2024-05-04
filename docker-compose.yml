@@ -32,5 +32,10 @@ services:
     ports:
       - "5437:5432"
 
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
 volumes:
   db_data: { }
