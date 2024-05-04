@@ -47,13 +47,7 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN = config.bot_token.get_secret_value()
 bot = Bot(BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 
-class aRedis(Redis):
-
-    async def aclose(self, close_connection_pool) -> None:
-        await super().close(close_connection_pool)
-
-
-redis = aRedis.from_url("redis://redis:6379/3")
+redis = Redis.from_url("redis://redis:6379/3")
 storage = RedisStorage(redis)
 
 dp = Dispatcher(storage=storage)
