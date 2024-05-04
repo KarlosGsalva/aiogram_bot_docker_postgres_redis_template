@@ -5,3 +5,4 @@ __pycache__/
 /bot/db_test_connection.py
 /alembic/versions/
 /test_connection.py
+/test_redis.py

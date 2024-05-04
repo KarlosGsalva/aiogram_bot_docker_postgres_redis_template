@@ -4,10 +4,11 @@ import logging
 from colorlog import ColoredFormatter
 
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from aiogram.client.default import DefaultBotProperties
 
+from redis.asyncio.client import Redis
 from sqlalchemy import inspect
 
 from bot.middlewares.middleware import DbSessionMiddleware
@@ -46,11 +47,19 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN = config.bot_token.get_secret_value()
 bot = Bot(BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 
-storage = MemoryStorage()
+class aRedis(Redis):
+
+    async def aclose(self, close_connection_pool) -> None:
+        await super().close(close_connection_pool)
+
+
+redis = aRedis.from_url("redis://redis:6379/3")
+storage = RedisStorage(redis)
+
 dp = Dispatcher(storage=storage)
+
 dp.update.middleware(DbSessionMiddleware(session_pool=SESSION_MAKER))
 dp.callback_query.middleware(CallbackAnswerMiddleware())
-
 dp.include_router(start_hndlr.router)
 
 
